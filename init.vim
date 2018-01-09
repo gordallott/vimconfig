@@ -21,10 +21,11 @@ Plug 'uarun/vim-protobuf'
 Plug 'ekalinin/Dockerfile.vim'
 Plug 'vim-scripts/Smart-Tabs'
 Plug 'garyburd/go-explorer'
-Plug 'yuttie/comfortable-motion.vim'
+"Plug 'yuttie/comfortable-motion.vim'
 Plug 'scrooloose/nerdtree'
 Plug 'majutsushi/tagbar'
 Plug 'tpope/vim-fugitive'
+Plug 'mklabs/split-term.vim'
 
 
 " Completion 
@@ -57,8 +58,13 @@ let g:airline_right_sep = '▜'
 " Color themes
 syntax enable
 set background=dark
-let base16colorspace=256
-colorscheme base16-railscasts
+"let base16colorspace=256
+"colorscheme base16-railscasts
+
+if filereadable(expand("~/.vimrc_background"))
+    let base16colorspace=256
+    source ~/.vimrc_background
+endif
 
 " vim-go 
 let g:go_highlight_functions = 1
@@ -79,7 +85,6 @@ set wildignore=*.o,*~,*.pyc
 set wildignore+=.git\*,.hg\*,.svn\*
 set wildignore+=node_modules\*",dash/static/* 
 set wildignore+=vendor\*
-set wildignore+=extern\*
 set wildignore+=pkg\*
 set wildignore+=test-profiles\*
 set wildignore+=testbin\*
@@ -134,12 +139,17 @@ let g:syntastic_go_gometalinter_exe = './gometalinter.sh'
 "let g:syntastic_go_gometalinter_args = '--deadline=15s --disable-all --enable="staticcheck"'
 
 " paste mode key comb
-nnoremap <F2> :set invpaste paste?<CR>
-set pastetoggle=<F2>
-set showmode
+" not needed for neovim
+" nnoremap <F2> :set invpaste paste?<CR>
+" set pastetoggle=<F2>
+" set showmode
+
 
 nnoremap <F7> :set invspell<CR>
 set spelllang=en_gb
+
+" reuses buffers with go-def
+let g:go_def_reuse_buffer = 1
 
 " vim-go keymaps
 let mapleader=","
@@ -155,10 +165,12 @@ au FileType go nmap <leader>c <Plug>(go-coverage)
 
 autocmd FileType go nmap <F5> :GoBuild<CR>
 autocmd FileType go nmap <F6> :GoTest<CR>
+autocmd FileType go nmap <S-F6> :GoTest -c<CR>
+autocmd FileType go nmap <C-F6> :GoTest -c<CR>
+autocmd FileType go nmap <F8> :GoCoverageToggle<CR>
+autocmd FileType go nmap <F2> <Plug>(go-def-split)
 autocmd FileType go nmap <F3> :GoAlternate!<CR>
-autocmd FileType go nmap <F4> :GoDecls<CR>
-
-nmap <F8> :TagbarToggle<CR>
+autocmd FileType go nmap <F4> <Plug>(go-callers)
 
 
 " vim md 
