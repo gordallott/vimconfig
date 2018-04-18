@@ -8,7 +8,7 @@ call plug#begin('~/.vim/plugged')
 " Plugins go here
 Plug 'chase/vim-ansible-yaml'
 Plug 'fatih/vim-go'
-Plug 'chriskempson/base16-vim'        
+Plug 'chriskempson/base16-vim'
 Plug 'scrooloose/syntastic'
 Plug 'ctrlpvim/ctrlp.vim'
 Plug 'vim-airline/vim-airline'
@@ -26,11 +26,12 @@ Plug 'scrooloose/nerdtree'
 Plug 'majutsushi/tagbar'
 Plug 'tpope/vim-fugitive'
 Plug 'mklabs/split-term.vim'
+Plug 'cespare/vim-toml'
 
-
-" Completion 
+" Completion
 Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
 Plug 'zchee/deoplete-go', { 'do': 'make'}
+Plug 'fszymanski/deoplete-emoji'
 
 call plug#end()
 
@@ -44,8 +45,8 @@ let g:deoplete#enable_at_startup = 1
 autocmd VimEnter * AirlineTheme base16
 let g:airline#extensions#tabline#enabled = 1
 let g:airline_theme='base16'
-let g:airline_left_sep = '▙'
-let g:airline_right_sep = '▜'
+"let g:airline_left_sep = '▙'
+"let g:airline_right_sep = '▜'
 "let g:airline_symbols.crypt = '🔒'
 "let g:airline_symbols.linenr = '¶'
 "let g:airline_symbols.maxlinenr = '☰'
@@ -61,18 +62,23 @@ set background=dark
 "let base16colorspace=256
 "colorscheme base16-railscasts
 
+set termguicolors
 if filereadable(expand("~/.vimrc_background"))
     let base16colorspace=256
     source ~/.vimrc_background
 endif
 
-" vim-go 
+" vim-go
 let g:go_highlight_functions = 1
 let g:go_highlight_methods = 1
 let g:go_highlight_structs = 1
 let g:go_highlight_interfaces = 1
 let g:go_highlight_build_constraints = 1
 let g:go_highlight_operators = 1
+let g:go_highlight_types = 1
+let g:go_highlight_fields = 1
+let g:go_highlight_build_constraints = 1
+let g:go_auto_sameids = 1
 
 let g:go_fmt_command = "goimports"
 
@@ -83,7 +89,7 @@ filetype indent on
 " Ignore compiled files
 set wildignore=*.o,*~,*.pyc
 set wildignore+=.git\*,.hg\*,.svn\*
-set wildignore+=node_modules\*",dash/static/* 
+set wildignore+=node_modules\*",dash/static/*
 set wildignore+=vendor\*
 set wildignore+=pkg\*
 set wildignore+=test-profiles\*
@@ -162,8 +168,19 @@ au FileType go nmap <leader>c <Plug>(go-coverage)
 "map <silent> <PageDown> 1000<C-D>
 "imap <silent> <PageUp> <C-O>1000<C-U>
 "imap <silent> <PageDown> <C-O>1000<C-D>
+"
+" run :GoBuild or :GoTestCompile based on the go file
+function! s:build_go_files()
+  let l:file = expand('%')
+  if l:file =~# '^\f\+_test\.go$'
+    call go#test#Test(0, 1)
+  elseif l:file =~# '^\f\+\.go$'
+    call go#cmd#Build(0)
+  endif
+endfunction
 
-autocmd FileType go nmap <F5> :GoBuild<CR>
+autocmd FileType go nmap <F5> :<C-u>call <SID>build_go_files()<CR>
+autocmd FileType go nmap <leader>t :GoDecls<CR>
 autocmd FileType go nmap <F6> :GoTest<CR>
 autocmd FileType go nmap <S-F6> :GoTest -c<CR>
 autocmd FileType go nmap <C-F6> :GoTest -c<CR>
@@ -173,7 +190,7 @@ autocmd FileType go nmap <F3> :GoAlternate!<CR>
 autocmd FileType go nmap <F4> <Plug>(go-callers)
 
 
-" vim md 
+" vim md
 let g:vim_markdown_folding_disabled = 1
 
 " ctrlp for watchly
@@ -193,3 +210,9 @@ noremap <LEFT>      <NOP>
 noremap <RIGHT>     <NOP>
 
 "autocmd vimenter * NERDTree
+autocmd BufWritePre * %s/\s\+$//e
+
+" Yaml
+autocmd FileType yaml setlocal ts=2 sts=2 sw=2 expandtab
+autocmd FileType yml setlocal ts=2 sts=2 sw=2 expandtab
+
